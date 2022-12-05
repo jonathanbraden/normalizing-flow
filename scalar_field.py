@@ -94,24 +94,24 @@ class ScalarAction():
         return torch.sum( action, dim=tuple(dims) )
 
 
-def apply_flow_to_prior(prior, coupling_layers, *, batch_size):
+def flow_forward_from_prior(prior, coupling_layers, *, batch_size):
     x = prior.sample_n(batch_size)
     logq = prior.log_prob(x)
     for layer in coupling_layers:
         x, logJ = layer.forward(x)
         logq -= logJ
     return x, logq
-    
-def calc_dkl(logp, logq):
+
+def kl_divergence(logp, logq):
     return (logq-logp).mean()
 
 def train_step(model, action, loss_fn, optimizer, batch_size, logging):
     layers, prior = model['layers'], model['prior']
     optimizer.zero_grad()
 
-    x, logq = apply_flow_to_prior(prior, layers, batch_size=batch_size)
+    x, logq = flow_forward_from_prior(prior, layers, batch_size=batch_size)
     logp = -action(x)
-    loss = calc_dkl(logp, logq)
+    loss = kl_divergence(logp, logq)
     loss.backward()
 
     optimizer.step()
