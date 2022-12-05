@@ -38,7 +38,7 @@ if __name__=="__main__":
     # Build a lattice model, and train
     L = 8
     lattice_shape = (L,L)
-    m2, lam = -4.0, 8.0
+    m2, lam = 1.0, 2.0
 
     action = ScalarAction(m2=m2, lam=lam)
     prior = SimpleNormal(torch.zeros(lattice_shape), torch.ones(lattice_shape))
