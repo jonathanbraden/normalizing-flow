@@ -93,7 +93,7 @@ class ScalarAction():
             action -= phi*torch.roll(phi,  1, d_)
         return torch.sum( action, dim=tuple(dims) )
 
-# debug thse still
+
 def apply_flow_to_prior(prior, coupling_layers, *, batch_size):
     x = prior.sample_n(batch_size)
     logq = prior.log_prob(x)

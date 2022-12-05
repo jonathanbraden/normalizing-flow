@@ -5,26 +5,6 @@ import matplotlib.pyplot as plt
 
 from scalar_field import *
 
-def test_box_mueller(batch_size=2**14):
-    a = np.random.random(size=batch_size)
-    p = np.random.random(size=batch_size)
-
-    g = np.sqrt(-2.*np.log(a))[:,np.newaxis] * np.stack( (np.cos(2.*np.pi*p), np.sin(2.*np.pi*p)), axis=-1)
-
-    f,ax = plt.subplots(1,2)
-    for a_ in ax:
-        a_.set_xticks([-2,0,2])
-        a_.set_yticks([-2,0,2])
-        a_.set_aspect('equal')
-
-    ax[0].hist2d(a,p,bins=30,range=[[-3.,3],[-3.,3.]])
-    ax[0].set_xlabel(r'$\hat{A}$')
-    ax[0].set_ylabel(r'$\hat{\phi}$')
-
-    ax[1].hist2d(g[:,0],g[:,1],bins=30,range=[[-3.,3],[-3.,3.]])
-    ax[1].set_xlabel(r'$\hat{G}_1$')
-    ax[1].set_ylabel(r'$\hat{G}_2$')
-
 def test_scalar_action():
     L = 8
     lattice_shape = (L,L)
@@ -54,15 +34,6 @@ if __name__=="__main__":
         torch.set_default_tensor_type(torch.DoubleTensor)
 
     print(f"Torch Device is {torch_device}")
-
-    # Testing the prior sampler
-    print("Testing Prior Sampler")
-    test_prior_sampler()
-    print("===============")
-
-    print("Testing Action")
-    test_scalar_action()
-    print("================")
     
     # Build a lattice model, and train
     L = 8
@@ -72,11 +43,7 @@ if __name__=="__main__":
     action = ScalarAction(m2=m2, lam=lam)
     prior = SimpleNormal(torch.zeros(lattice_shape), torch.ones(lattice_shape))
 
-    #n_layers = 16
-    #hidden_sizes = [8,8]
-    #kernel_size = 3
-
-    n_layers = 4
+    n_layers = 8
     hidden_sizes = [L,L]
     kernel_size = 3
     
@@ -106,4 +73,8 @@ if __name__=="__main__":
 
     fit_intercept = np.mean(S) - np.mean(S_eff)
 
-    
+    fig, ax = plt.subplots()
+    ax.hist2d(S_eff,S,bins=20)
+    fit_intercept = np.mean(S)-np.mean(S_eff)
+    xv = np.linspace(5.,35.,4,endpoint=True)
+    ax.plot(xv,xv+fit_intercept,color='w')
